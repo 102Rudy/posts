@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.getkeepsafe.dexcount'
+apply from: "$project.rootDir/secret.gradle"
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+    defaultConfig {
+        applicationId "com.rygital.posts"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode versions.code
+        versionName versions.name
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias debugSignConfigs.keyAlias
+            keyPassword debugSignConfigs.keyPassword
+            storeFile file(debugSignConfigs.storeFile)
+            storePassword debugSignConfigs.storePassword
+        }
+        release {
+            keyAlias releaseSignConfigs.keyAlias
+            keyPassword releaseSignConfigs.keyPassword
+            storeFile file(releaseSignConfigs.storeFile)
+            storePassword releaseSignConfigs.storePassword
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+        release {
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            proguardFiles fileTree('../proguard').asList().toArray()
+            signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures.viewBinding = true
+}
+
+dependencies {
+    implementation libraries.androidxDesign
+    implementation libraries.androidxCardView
+    implementation libraries.androidxConstraintLayout
+
+    implementation libraries.dagger
+    kapt libraries.daggerCompiler
+
+    implementation libraries.retrofit
+    implementation libraries.retrofitConverterGson
+    implementation libraries.okHttpLogging
+    implementation libraries.coroutinesCore
+    implementation libraries.coroutinesAndroid
+
+    implementation libraries.timber
+
+    testImplementation libraries.junit
+    testImplementation libraries.mockito
+}
